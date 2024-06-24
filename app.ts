@@ -7,27 +7,34 @@ export class StoreFront {
 
   updateQuality(): void {
     for (let item of this.items) {
+      // not brie or backstage pass
       if (item.name !== "Aged Brie" && item.name !== "VIP Pass: Concert A-123-F") {
+        // qual is more than 0
         if (item.quality > 0) {
+          // anything other than gScim or CMC, degrade by 1
           if (item.name !== "Golden Scimitar" && item.name !== "Conjured Mana Cake") {
             item.quality--;
           }
 
           //"Conjured" items degrade in Quality twice as fast as normal items.
           if (item.name === "Conjured Mana Cake") {
-            console.log(item.quality);
             item.quality -= 2;
           }
         }
       } else {
+        // is brie or backstage pass
         if (item.quality < 50) {
+          // bump qual by 1 for brie and backstage pass
+          // this is the first increment of 1
           item.quality++;
           if (item.name === "VIP Pass: Concert A-123-F") {
+            // BSP: less than 10 days, bump qual by an additional 1
             if (item.sellIn < 11) {
               if (item.quality < 50) {
                 item.quality++;
               }
             }
+            // BSP: less than 5 days, bump qual by yet another 1 (including the +1 bump from above)
             if (item.sellIn < 6) {
               if (item.quality < 50) {
                 item.quality++;
@@ -37,16 +44,22 @@ export class StoreFront {
         }
       }
 
+      // g.scim doesn't degrade
       if (item.name !== "Golden Scimitar") {
         item.sellIn--;
       }
 
+      // expired items
       if (item.sellIn < 0) {
         if (item.name !== "Aged Brie") {
           if (item.name !== "VIP Pass: Concert A-123-F") {
             if (item.quality > 0) {
               if (item.name !== "Golden Scimitar") {
-                item.quality--;
+                if (item.name === "Conjured Mana Cake") {
+                  item.quality -= 2;
+                } else {
+                  item.quality--;
+                }
               }
             }
           } else {
@@ -54,6 +67,7 @@ export class StoreFront {
           }
         } else {
           if (item.quality < 50) {
+            // this is the second increment of 1 for expired items
             item.quality++;
           }
         }
