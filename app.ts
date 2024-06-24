@@ -29,13 +29,13 @@ export class StoreFront {
           item.quality++;
           if (item.name === "VIP Pass: Concert A-123-F") {
             // BSP: less than 10 days, bump qual by an additional 1
-            if (item.sellIn < 11) {
+            if (item.sellDays < 11) {
               if (item.quality < 50) {
                 item.quality++;
               }
             }
-            // BSP: less than 5 days, bump qual by yet another 1 (including the +1 bump from above)
-            if (item.sellIn < 6) {
+            // BSP: less than 5 days, bump qual by yet another 1 (including the +1 bump from above, total 3)
+            if (item.sellDays < 6) {
               if (item.quality < 50) {
                 item.quality++;
               }
@@ -46,11 +46,11 @@ export class StoreFront {
 
       // g.scim doesn't degrade
       if (item.name !== "Golden Scimitar") {
-        item.sellIn--;
+        item.sellDays--;
       }
 
       // expired items
-      if (item.sellIn < 0) {
+      if (item.sellDays < 0) {
         if (item.name !== "Aged Brie") {
           if (item.name !== "VIP Pass: Concert A-123-F") {
             if (item.quality > 0) {
@@ -78,16 +78,16 @@ export class StoreFront {
 
 export class Item {
   name: string;
-  sellIn: number;
   quality: number;
+  sellDays: number;
 
-  constructor(name: string, sellIn: number, quality: number) {
+  constructor(name: string, sellDays: number, quality: number) {
     this.name = name;
-    this.sellIn = sellIn;
     this.quality = quality;
+    this.sellDays = sellDays;
   }
 
   toString(): string {
-    return `${this.name}, ${this.sellIn}, ${this.quality}`;
+    return `${this.name}, ${this.sellDays}, ${this.quality}`;
   }
 }

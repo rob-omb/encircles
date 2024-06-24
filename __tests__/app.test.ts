@@ -23,15 +23,15 @@ beforeEach(() => (storeFront = new StoreFront(generateItems())));
 
 describe("Item class", () => {
   const name = "Some product";
-  const sellIn = 3;
   const quality = 1;
+  const sellDays = 3;
 
-  const newItem = new Item(name, sellIn, quality);
+  const newItem = new Item(name, sellDays, quality);
 
   it("should create an item with the correct properties", () => {
     expect(newItem.name).toBe(name);
-    expect(newItem.sellIn).toBe(sellIn);
     expect(newItem.quality).toBe(quality);
+    expect(newItem.sellDays).toBe(sellDays);
   });
 
   it("should strigify the item", () => {
