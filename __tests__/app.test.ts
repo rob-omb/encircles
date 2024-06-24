@@ -21,6 +21,26 @@ function generateItems() {
 let storeFront: StoreFront;
 beforeEach(() => (storeFront = new StoreFront(generateItems())));
 
+describe("Item class", () => {
+  const name = "Some product";
+  const sellIn = 3;
+  const quality = 1;
+
+  const newItem = new Item(name, sellIn, quality);
+
+  it("should create an item with the correct properties", () => {
+    expect(newItem.name).toBe(name);
+    expect(newItem.sellIn).toBe(sellIn);
+    expect(newItem.quality).toBe(quality);
+  });
+
+  it("should strigify the item", () => {
+    const expected = "Some product, 3, 1";
+
+    expect(newItem.toString()).toBe(expected);
+  });
+});
+
 describe("updateQuality function", () => {
   it("should not degrade quality of Golden Scimitar", () => {
     const goldenScimitar = storeFront.items[4];
