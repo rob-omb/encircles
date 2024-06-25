@@ -4,7 +4,7 @@ function generateItems() {
   return [
     new Item("+5 Dexterity Vest", "common", 20, 10),
     new Item("Aged Brie", "aged", 0, 2),
-    new Item("Elixir of the Mongoose", "common", 7, 5),
+    new Item("Elixir of the Mongoose", "common", 1, 1),
     new Item("Golden Scimitar", "legendary", 80, 0),
     new Item("Golden Scimitar", "legendary", 80, -1),
     new Item("VIP Pass: Concert A-123-F", "special", 20, 15),
@@ -15,6 +15,8 @@ function generateItems() {
     new Item("+5 Dexterity Vest", "common", 20, -1),
     new Item("Aged Brie", "aged", 48, -10),
     new Item("VIP Pass: Concert A-123-F", "special", 20, -1),
+    new Item("Conjured Mana Cake", "conjured", 1, 1),
+    new Item("VIP Pass: Concert A-123-F", "special", 50, 15),
   ];
 }
 
@@ -106,11 +108,24 @@ describe("updateQuality function", () => {
 
   it("should never increase quality beyond 50", () => {
     const reallyOldBrie = storeFront.items[11];
+    const highQualitySpecialItem = storeFront.items[14];
 
     storeFront.updateQuality();
     storeFront.updateQuality();
 
     expect(reallyOldBrie.quality).toBe(50);
+    expect(highQualitySpecialItem.quality).toBe(50);
+  });
+
+  it("should not decrease quality beyond 0", () => {
+    const lowQualityCommonItem = storeFront.items[2];
+    const lowQualityConjuredItem = storeFront.items[13];
+
+    storeFront.updateQuality();
+    storeFront.updateQuality();
+
+    expect(lowQualityCommonItem.quality).toBe(0);
+    expect(lowQualityConjuredItem.quality).toBe(0);
   });
 
   it("should increase quality of 'special' items by 1 when days are greater than 10", () => {
