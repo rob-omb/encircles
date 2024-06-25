@@ -2,19 +2,19 @@ import { Item, StoreFront } from "../app";
 
 function generateItems() {
   return [
-    new Item("+5 Dexterity Vest", 10, 20),
-    new Item("Aged Brie", 2, 0),
-    new Item("Elixir of the Mongoose", 5, 7),
-    new Item("Golden Scimitar", 0, 80),
-    new Item("Golden Scimitar", -1, 80),
-    new Item("VIP Pass: Concert A-123-F", 15, 20),
-    new Item("VIP Pass: Concert A-123-F", 10, 20),
-    new Item("VIP Pass: Concert A-123-F", 5, 20),
-    new Item("Conjured Mana Cake", 3, 50),
-    new Item("Conjured Mana Cake", -1, 50),
-    new Item("+5 Dexterity Vest", -1, 20),
-    new Item("Aged Brie", -10, 48),
-    new Item("VIP Pass: Concert A-123-F", -1, 20),
+    new Item("+5 Dexterity Vest", "common", 20, 10),
+    new Item("Aged Brie", "aged", 0, 2),
+    new Item("Elixir of the Mongoose", "common", 7, 5),
+    new Item("Golden Scimitar", "legendary", 80, 0),
+    new Item("Golden Scimitar", "legendary", 80, -1),
+    new Item("VIP Pass: Concert A-123-F", "special", 20, 15),
+    new Item("VIP Pass: Concert A-123-F", "special", 20, 10),
+    new Item("VIP Pass: Concert A-123-F", "special", 20, 5),
+    new Item("Conjured Mana Cake", "conjured", 50, 3),
+    new Item("Conjured Mana Cake", "conjured", 50, -1),
+    new Item("+5 Dexterity Vest", "common", 20, -1),
+    new Item("Aged Brie", "aged", 48, -10),
+    new Item("VIP Pass: Concert A-123-F", "special", 20, -1),
   ];
 }
 
@@ -23,26 +23,28 @@ beforeEach(() => (storeFront = new StoreFront(generateItems())));
 
 describe("Item class", () => {
   const name = "Some product";
+  const type = "common";
   const quality = 1;
   const sellDays = 3;
 
-  const newItem = new Item(name, sellDays, quality);
+  const newItem = new Item(name, type, quality, sellDays);
 
   it("should create an item with the correct properties", () => {
     expect(newItem.name).toBe(name);
+    expect(newItem.type).toBe(type);
     expect(newItem.quality).toBe(quality);
     expect(newItem.sellDays).toBe(sellDays);
   });
 
   it("should strigify the item", () => {
-    const expected = "Some product, 3, 1";
+    const expected = "Some product, common, 1, 3";
 
     expect(newItem.toString()).toBe(expected);
   });
 });
 
 describe("updateQuality function", () => {
-  it("should not degrade quality of Golden Scimitar", () => {
+  it("should not degrade quality of 'legendary' items", () => {
     const goldenScimitar = storeFront.items[4];
 
     storeFront.updateQuality();
@@ -51,7 +53,7 @@ describe("updateQuality function", () => {
     expect(goldenScimitar.quality).toBe(80);
   });
 
-  it("should degrade quality by 1 for regular items", () => {
+  it("should degrade quality by 1 for 'common' items", () => {
     const dexVest = storeFront.items[0];
 
     storeFront.updateQuality();
@@ -60,7 +62,7 @@ describe("updateQuality function", () => {
     expect(dexVest.quality).toBe(18);
   });
 
-  it("should degrade Conjured Mana Cake twice as fast", () => {
+  it("should degrade 'conjured' items twice as fast", () => {
     const conjuredManaCake = storeFront.items[8];
 
     storeFront.updateQuality();
@@ -69,7 +71,7 @@ describe("updateQuality function", () => {
     expect(conjuredManaCake.quality).toBe(46);
   });
 
-  it("should degrade expired items twice as fast", () => {
+  it("should degrade 'expired' items twice as fast", () => {
     const expiredManaCake = storeFront.items[9];
     const expiredDexVest = storeFront.items[10];
 
@@ -83,7 +85,7 @@ describe("updateQuality function", () => {
     expect(expiredDexVest.quality).toBe(16);
   });
 
-  it("should increase quality of Aged Brie each day", () => {
+  it("should increase quality of 'aged' items each day", () => {
     // days start at 2, quality is 0
     const agedBrie = storeFront.items[1];
 
@@ -111,7 +113,7 @@ describe("updateQuality function", () => {
     expect(reallyOldBrie.quality).toBe(50);
   });
 
-  it("should increase quality of Backstage passes by 1 when days are greater than 10", () => {
+  it("should increase quality of 'special' items by 1 when days are greater than 10", () => {
     const regularBackStagePass = storeFront.items[5];
 
     storeFront.updateQuality();
@@ -120,7 +122,7 @@ describe("updateQuality function", () => {
     expect(regularBackStagePass.quality).toBe(22);
   });
 
-  it("should increase quality of Backstage passes by 2 when days are less than 10 and greater than 5", () => {
+  it("should increase quality of 'special' items by 2 when days are less than 10 and greater than 5", () => {
     const tenDayBackStagePass = storeFront.items[6];
 
     storeFront.updateQuality();
@@ -129,7 +131,7 @@ describe("updateQuality function", () => {
     expect(tenDayBackStagePass.quality).toBe(24);
   });
 
-  it("should increase quality of Backstage passes by 3 when days are less than 5 and greater than 0", () => {
+  it("should increase quality of 'special' items by 3 when days are less than 5 and greater than 0", () => {
     const fiveDayBackStagePass = storeFront.items[7];
 
     storeFront.updateQuality();
@@ -138,7 +140,7 @@ describe("updateQuality function", () => {
     expect(fiveDayBackStagePass.quality).toBe(26);
   });
 
-  it("should set quality to 0 for Backstage passes when expired", () => {
+  it("should set quality to 0 for 'special' items when expired", () => {
     const expiredBackStagePass = storeFront.items[12];
 
     storeFront.updateQuality();
