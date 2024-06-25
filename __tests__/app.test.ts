@@ -49,7 +49,6 @@ describe("updateQuality function", () => {
 
     const dexVest = storeFront.items[0];
 
-    console.log(dexVest);
     storeFront.updateQuality();
     storeFront.updateQuality();
 
