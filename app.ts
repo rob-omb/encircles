@@ -7,49 +7,78 @@ export class StoreFront {
 
   updateQuality(): void {
     for (let item of this.items) {
-      if (item.type === "aged" || item.type === "special") {
-        this.updateSpecialItemQuality(item);
-      } else {
-        this.updateCommonItemQuality(item);
+      switch (item.type) {
+        case "legendary":
+          break;
+
+        case "aged":
+          this.updateAgedItemQuality(item);
+          break;
+
+        case "special":
+          this.updateSpecialItemQuality(item);
+          break;
+
+        case "conjured":
+          this.updateConjuredItemQuality(item);
+          break;
+
+        default:
+          this.updateCommonItemQuality(item);
+          break;
       }
 
-      if (item.type !== "legendary") {
-        item.sellDays--;
-      }
+      this.updateSellDays(item);
+    }
+  }
 
-      if (item.sellDays < 0) {
-        this.updateExpiredItemQuality(item);
-      }
+  updateSellDays(item: Item): void {
+    if (item.type !== "legendary") {
+      item.sellDays--;
+    }
+
+    if (item.sellDays < 0) {
+      this.updateExpiredItemQuality(item);
     }
   }
 
   updateCommonItemQuality(item: Item): void {
-    if (item.quality > 0 && item.name !== "Golden Scimitar") {
-      if (item.name === "Conjured Mana Cake") {
-        item.quality -= 2;
-      } else {
-        item.quality--;
-      }
+    if (item.quality > 0) {
+      item.quality--;
+    }
+  }
+
+  updateConjuredItemQuality(item: Item): void {
+    if (item.quality > 0) {
+      item.quality -= 2;
     }
   }
 
   updateSpecialItemQuality(item: Item): void {
     if (item.quality < 50) {
       item.quality++;
-      if (item.type === "special") {
-        if (item.sellDays < 11) {
-          item.quality++;
-        }
 
-        if (item.sellDays < 6) {
-          item.quality++;
-        }
+      if (item.sellDays < 11) {
+        item.quality++;
       }
+
+      if (item.sellDays < 6) {
+        item.quality++;
+      }
+    }
+  }
+
+  updateAgedItemQuality(item: Item): void {
+    if (item.quality < 50) {
+      item.quality++;
     }
   }
 
   updateExpiredItemQuality(item: Item): void {
     switch (item.type) {
+      case "legendary":
+        break;
+
       case "aged":
         if (item.quality < 50) {
           item.quality++;
@@ -60,15 +89,12 @@ export class StoreFront {
         item.quality = 0;
         break;
 
-      case "legendary":
-        break;
-
       case "conjured":
-        item.quality -= 2;
+        item.quality > 0 ? (item.quality -= 2) : (item.quality = 0);
         break;
 
       default:
-        item.quality--;
+        item.quality > 0 ? item.quality-- : (item.quality = 0);
         break;
     }
   }
