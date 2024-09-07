@@ -1,3 +1,5 @@
+import { productType } from "./constants";
+
 export class StoreFront {
   items: Item[];
 
@@ -6,97 +8,87 @@ export class StoreFront {
   }
 
   updateQuality(): void {
+    // minus 1 if quality > 0
+    // minus sellDays by 1
+    // minus 1 again if sellDays <= 0 && quality > 0
+
+    // minus sellIn days by 1
+    // if sellIn days < 0 ? quality -2 : quality -1
+    // Math.max()
     for (let item of this.items) {
+      this.updateSellDays(item);
+
       switch (item.type) {
-        case "legendary":
+        case productType.legendary:
           break;
 
-        case "aged":
-          this.updateAgedItemQuality(item);
+        case productType.agedBrie:
+          this.updateAgedBrieItemQuality(item);
           break;
 
-        case "special":
-          this.updateSpecialItemQuality(item);
+        case productType.backstagePass:
+          this.updateBackstagePassItemQuality(item);
           break;
 
-        case "conjured":
+        case productType.conjured:
           this.updateConjuredItemQuality(item);
           break;
 
         default:
-          this.updateCommonItemQuality(item);
+          this.updateNormalItemQuality(item);
           break;
       }
-
-      this.updateSellDays(item);
     }
   }
 
   updateSellDays(item: Item): void {
-    if (item.type !== "legendary") {
+    if (item.type !== productType.legendary) {
       item.sellDays--;
-    }
-
-    if (item.sellDays < 0) {
-      this.updateExpiredItemQuality(item);
     }
   }
 
-  updateCommonItemQuality(item: Item): void {
-    if (item.quality > 0) {
+  updateNormalItemQuality(item: Item): void {
+    if (item.sellDays < 0) {
+      item.quality -= 2;
+    } else if (item.quality > 0) {
       item.quality--;
     }
+
+    item.quality = Math.max(item.quality, 0);
   }
 
   updateConjuredItemQuality(item: Item): void {
-    if (item.quality > 0) {
+    if (item.sellDays < 0) {
+      item.quality -= 4;
+    } else if (item.quality > 0) {
       item.quality -= 2;
     }
+
+    item.quality = Math.max(item.quality, 0);
   }
 
-  updateSpecialItemQuality(item: Item): void {
-    if (item.quality < 50) {
-      item.quality++;
-
-      if (item.sellDays < 11) {
-        item.quality++;
-      }
-
-      if (item.sellDays < 6) {
-        item.quality++;
-      }
-    }
-  }
-
-  updateAgedItemQuality(item: Item): void {
-    if (item.quality < 50) {
+  updateBackstagePassItemQuality(item: Item): void {
+    if (item.sellDays <= 0) {
+      item.quality = 0;
+    } else if (item.sellDays < 6) {
+      item.quality += 3;
+    } else if (item.sellDays < 11) {
+      item.quality += 2;
+    } else {
       item.quality++;
     }
+
+    item.quality = Math.min(item.quality, 50);
   }
 
-  updateExpiredItemQuality(item: Item): void {
-    switch (item.type) {
-      case "legendary":
-        break;
-
-      case "aged":
-        if (item.quality < 50) {
-          item.quality++;
-        }
-        break;
-
-      case "special":
-        item.quality = 0;
-        break;
-
-      case "conjured":
-        item.quality > 0 ? (item.quality -= 2) : (item.quality = 0);
-        break;
-
-      default:
-        item.quality > 0 ? item.quality-- : (item.quality = 0);
-        break;
+  updateAgedBrieItemQuality(item: Item): void {
+    if (item.sellDays < 0) {
+      item.quality += 2;
+    } else {
+      item.quality++;
     }
+
+    item.quality = Math.min(item.quality, 50);
   }
 }
 
@@ -107,10 +99,27 @@ export class Item {
   sellDays: number;
 
   constructor(name: string, type: string, quality: number, sellDays: number) {
+    const isLegendaryItem = type === productType.legendary;
+
     this.name = name;
     this.type = type;
-    this.quality = quality;
-    this.sellDays = sellDays;
+    this.quality = isLegendaryItem ? 80 : quality;
+    this.sellDays = isLegendaryItem ? 0 : sellDays;
+  }
+
+  toString(): string {
+    return `${this.name}, ${this.type}, ${this.quality}, ${this.sellDays}`;
+  }
+}
+
+export class LegendaryItem {
+  name: string;
+  type: string;
+  quality: number;
+  sellDays: number;
+
+  constructor(name: string) {
+    (this.name = name), (this.type = productType.legendary), (this.quality = 80), (this.sellDays = 0);
   }
 
   toString(): string {
